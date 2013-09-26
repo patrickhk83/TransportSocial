@@ -11,11 +11,19 @@
     <?php } ?>
     <div class="form-group">
       <label for="departureAirportCode">Departure Airport Code</label>
-      <input type="text" class="form-control" id="departureAirportCode" name="departureAirportCode">
+      <select class="form-control" id="departureAirportCode" name="departureAirportCode">
+        <?php foreach($airports as $airport) { ?>
+          <option value="<?php echo $airport->iata; ?>"><?php echo $airport->name." (".$airport->iata.")"; ?></option>
+        <?php } ?>
+      </select>
     </div>
     <div class="form-group">
       <label for="arrivalAirportCode">Arrival Airport Code</label>
-      <input type="text" class="form-control" id="arrivalAirportCode" name="arrivalAirportCode">
+      <select class="form-control" id="arrivalAirportCode" name="arrivalAirportCode">
+        <?php foreach($airports as $airport) { ?>
+          <option value="<?php echo $airport->iata; ?>"><?php echo $airport->name." (".$airport->iata.")"; ?></option>
+        <?php } ?>
+      </select>
     </div>
     <div class="form-group">
       <label for="Date">Date</label>

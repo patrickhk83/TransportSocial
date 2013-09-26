@@ -3,7 +3,9 @@
     <?php echo $message; ?>
   </div>
 <?php } ?>
-<div class="list-group">
+
+<?php if(count($flights) > 0): ?>
+  <div class="list-group">
   <?php foreach($flights as $flight): ?>
     <li class="list-group-item">
     <div class="flightNumber">
@@ -18,8 +20,8 @@
     </div>
 
     <div class="times">
-      <p>Arrival Time: <?php echo date('d/m/Y h:m', strtotime($flight->arrivalTime)); ?></p>
       <p>Departure Time: <?php echo date('d/m/Y h:m', strtotime($flight->departureTime)); ?></p>
+      <p>Arrival Time: <?php echo date('d/m/Y h:m', strtotime($flight->arrivalTime)); ?></p>
     </div>
     <?php if(isset($user)) { ?>
       <?php if(!$flight->isSaved) { ?>
@@ -29,6 +31,9 @@
       <?php } ?>
     <?php } ?>
     </li>
-
   <?php endforeach; ?>
-</div>
+  </div>
+<?php else: ?>
+  <p>Sorry, it appears that no flights were found!</p>
+<?php endif; ?>
+

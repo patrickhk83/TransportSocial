@@ -11,7 +11,11 @@
     <?php } ?>
     <div class="form-group">
       <label for="carrierCode">Carrier Code</label>
-      <input type="text" class="form-control" id="carrierCode" name="carrierCode">
+      <select class="form-control" id="carrierCode" name="carrierCode">
+        <?php foreach($airlines as $airline) { ?>
+          <option value="<?php echo $airline->iata; ?>"><?php echo $airline->name." (".$airline->iata.")"; ?></option>
+        <?php } ?>
+      </select>
     </div>
     <div class="form-group">
       <label for="FlightNo">Flight Number</label>

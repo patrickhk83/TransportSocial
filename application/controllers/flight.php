@@ -41,9 +41,10 @@ class Flight extends MY_Controller {
         return;
       }
     }
+    $data['airlines'] = $this->_getAllAirlines();
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flight by Flight Number');
-    $this->template->write_view('content', 'flight/searchByFlight', TRUE);
+    $this->template->write_view('content', 'flight/searchByFlight', $data, TRUE);
     $this->template->render();
   }
 
@@ -70,9 +71,10 @@ class Flight extends MY_Controller {
         return;
       }
     }
+    $data['airports'] = $this->_getAllAirports();
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flights by Airport');
-    $this->template->write_view('content', 'flight/searchByAirport', TRUE);
+    $this->template->write_view('content', 'flight/searchByAirport', $data, TRUE);
     $this->template->render();
   }
 
@@ -98,9 +100,10 @@ class Flight extends MY_Controller {
         return;
       }
     }
+    $data['airports'] = $this->_getAllAirports();
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flights by Route');
-    $this->template->write_view('content', 'flight/searchByRoute', TRUE);
+    $this->template->write_view('content', 'flight/searchByRoute', $data, TRUE);
     $this->template->render();
   }
 
@@ -154,6 +157,16 @@ class Flight extends MY_Controller {
     $this->template->write('title', 'Saved Flights');
     $this->template->write_view('content', 'flight/result', $data, TRUE);
     $this->template->render();
+  }
+
+  public function _getAllAirports() {
+    $this->load->model('Airport_Model', 'airport');
+    return $this->airport->getAll();
+  }
+
+  public function _getAllAirlines() {
+    $this->load->model('Airline_Model', 'airline');
+    return $this->airline->getAll();
   }
 
   /**
