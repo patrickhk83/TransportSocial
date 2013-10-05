@@ -16,7 +16,7 @@ class MY_Model extends CI_Model {
      */
     function initialize() {
       $this->rest->initialize(array(
-        'server' => 'https://api.flightstats.com/flex/'.$this->type.'/rest/v1/json/'
+        'server' => 'https://api.flightstats.com/flex/'.$this->type.'/rest/v2/json/'
       ));
     }
 

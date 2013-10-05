@@ -37,5 +37,13 @@ define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
 
+/**
+ * These are used for privacy settings
+ */
+
+define('ONLY_FRIENDS', 0);
+define('OTHER_USERS', 1);
+define('ONLY_YOU', 2);
+
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

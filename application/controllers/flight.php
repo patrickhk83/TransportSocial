@@ -113,13 +113,8 @@ class Flight extends MY_Controller {
    * @param  [string] $carrierCode
    * @param  [string] $date
    */
-  public function saveFlight($flightNo, $carrierCode, $date) {
-    $request = array(
-      'flightNo' => $flightNo,
-      'carrierCode' => $carrierCode,
-      'date' => $this->_splitDate($date)
-    );
-    if($this->flight->saveFlight($request, $this->user->id)) {
+  public function saveFlight($flightId) {
+    if($this->flight->saveFlight($flightId, $this->user->id, $this->input->post('privacy'))) {
       $this->session->set_flashdata('message', 'The flight has been saved successfully');
       $this->session->set_flashdata('message_class', 'alert-success');
     }
@@ -130,20 +125,28 @@ class Flight extends MY_Controller {
     redirect('/flight/savedFlights/'.$this->user->id, 'refresh');
   }
 
+  public function setPrivacy($flightId) {
+    $data['flightId'] = $flightId;
+    $this->template->write('title', 'Set Privacy Settings');
+    $this->template->write_view('content', 'flight/privacy', $data, TRUE);
+    $this->template->render();
+
+  }
+
   /**
    * Delete a flight
    * @param  [string] $flightNo
    * @param  [string] $userId
    */
-  public function deleteFlight($flightNo, $userId) {
-    if($this->flight->deleteFlight($flightNo, $userId)) {
+  public function deleteFlight($flightId) {
+    if($this->flight->deleteFlight($flightId, $this->user->id)) {
       $this->session->set_flashdata('message', 'You have successfully deleted the saved flight');
       $this->session->set_flashdata('message_class', 'alert-success');
     } else {
       $this->session->set_flashdata('message', 'You were unable to delete the saved flight');
       $this->session->set_flashdata('message_class', 'alert-danger');
     }
-    redirect('/flight/savedFlights/'.$userId, 'refresh');
+    redirect('/flight/savedFlights/'.$this->user->id, 'refresh');
   }
 
   /**
@@ -151,12 +154,20 @@ class Flight extends MY_Controller {
    * @param  [string] $userId
    */
   public function savedFlights($userId) {
-    $data['flights'] = $this->flight->_isSaved($this->flight->getAllSavedFlights($userId), $userId);
-    $data['message'] = $this->session->flashdata('message');
-    $data['message_class'] = $this->session->flashdata('message_class');
-    $this->template->write('title', 'Saved Flights');
-    $this->template->write_view('content', 'flight/result', $data, TRUE);
-    $this->template->render();
+    if(isset($this->user->id) && $this->user->id == $userId) {
+      $userId = (isset($this->user) ? $this->user->id : null);
+      $flights = $this->flight->_appendPassengersToFlight($this->flight->getAllSavedFlights($userId), $userId);
+      $data['flights'] = $this->flight->_isSaved($flights, $userId);
+      $data['message'] = $this->session->flashdata('message');
+      $data['message_class'] = $this->session->flashdata('message_class');
+      $this->template->add_js('/assets/js/information.js');
+      $this->template->write('title', 'Saved Flights');
+      $this->template->write_view('content', 'flight/result', $data, TRUE);
+      $this->template->render();
+    }
+    else {
+      redirect('/');
+    }
   }
 
   public function _getAllAirports() {
@@ -189,7 +200,15 @@ class Flight extends MY_Controller {
    * @param  [array] $result
    */
   public function _renderFlightResults($result) {
-    $data['flights'] = $this->flight->_isSaved($result->scheduledFlights, $this->user->id);
+    var_dump($this->user->id);
+    $userId = (isset($this->user) ? $this->user->id : null);
+    $result = $this->flight->_appendPassengersToFlight($result->flightStatuses, $userId);
+    if(isset($this->user)) {
+      $data['flights'] = $this->flight->_isSaved($result, $this->user->id);
+    }
+    else {
+      $data['flights'] = $result;
+    }
     $this->template->write('title', 'Flight Results');
     $this->template->write_view('content', 'flight/result', $data, TRUE);
     $this->template->render();

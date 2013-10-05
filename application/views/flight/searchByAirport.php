@@ -30,10 +30,10 @@
     </div>
     <div class="form-group">
       <label class="radio-inline">
-        <input type="radio" name="direction" value="arriving">Arriving
+        <input type="radio" name="direction" value="arr">Arriving
       </label>
       <label class="radio-inline">
-        <input type="radio" name="direction" value="departing">Departing
+        <input type="radio" name="direction" value="dep">Departing
       </label>
     </div>
     <div class="form-group">
