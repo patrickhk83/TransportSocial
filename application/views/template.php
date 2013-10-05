@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="<?php echo site_url('/assets/css/style.css'); ?>">
     <?php if ($_styles) { echo $_styles; } ?>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="<?php echo site_url('/assets/js/tooltip.js'); ?>"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <?php if ($_scripts) { echo $_scripts; } ?>
   </head>
