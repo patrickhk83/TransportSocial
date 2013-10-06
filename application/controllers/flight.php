@@ -200,7 +200,6 @@ class Flight extends MY_Controller {
    * @param  [array] $result
    */
   public function _renderFlightResults($result) {
-    var_dump($this->user->id);
     $userId = (isset($this->user) ? $this->user->id : null);
     $result = $this->flight->_appendPassengersToFlight($result->flightStatuses, $userId);
     if(isset($this->user)) {
