@@ -1,11 +1,11 @@
 
   	<script type="text/javascript">
 		$(document).ready(function(){
-			enable_search_airport("<?php echo site_url("$controller_name/suggest_airport");?>");
+			enable_search_airport("<?php echo site_url($this->router->fetch_class().'/suggest_airport');?>");
 
 		});
 	</script>
-  <form action="<?php echo site_url("$controller_name/searchByAirport"); ?>" method="post">
+  <form action="<?php echo site_url($this->router->fetch_class().'/searchByAirport'); ?>" method="post">
     <?php if(validation_errors()) { ?>
       <div class="alert alert-danger">
         <?php echo validation_errors();  ?>

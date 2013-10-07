@@ -41,12 +41,9 @@ class Flight extends MY_Controller {
         return;
       }
     }
-    $data['airlines'] = $this->_getAllAirlines();
-	/** get controller name(eg. "flight"). **/
-    $data['controller_name'] = strtolower(get_class());
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flight by Flight Number');
-    $this->template->write_view('content', 'flight/searchByFlight', $data, TRUE);
+    $this->template->write_view('content', 'flight/searchByFlight', TRUE);
     $this->template->render();
   }
 
@@ -73,12 +70,9 @@ class Flight extends MY_Controller {
         return;
       }
     }
-    $data['airports'] = $this->_getAllAirports();
-	/** get controller name(eg. "flight"). **/
-    $data['controller_name'] = strtolower(get_class());
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flights by Airport');
-    $this->template->write_view('content', 'flight/searchByAirport', $data, TRUE);
+    $this->template->write_view('content', 'flight/searchByAirport', TRUE);
     $this->template->render();
   }
 
@@ -104,10 +98,9 @@ class Flight extends MY_Controller {
         return;
       }
     }
-    $data['airports'] = $this->_getAllAirports();
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flights by Route');
-    $this->template->write_view('content', 'flight/searchByRoute', $data, TRUE);
+    $this->template->write_view('content', 'flight/searchByRoute', TRUE);
     $this->template->render();
   }
 
@@ -228,7 +221,7 @@ class Flight extends MY_Controller {
   }
 
    /**
-   * 
+   *
    * get Airport Code autocomplete result
    * @param  void
    * @return json
@@ -245,7 +238,7 @@ class Flight extends MY_Controller {
 
 
   /**
-   * 
+   *
    * get Carrier Code autocomplete result
    * @param  void
    * @return json
@@ -257,12 +250,12 @@ class Flight extends MY_Controller {
   	$suggestions = $this->airline->get_search_suggestions_airline($q , 30);
   	echo json_encode($suggestions);
   }
-  
+
   public function get_iata_code($string) {
 	$iata = explode('(' , $string);
 	$iata = explode(')' , $iata[1]);
 	return $iata[0];
   }
- 
+
 }
 
