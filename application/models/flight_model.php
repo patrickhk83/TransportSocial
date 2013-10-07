@@ -33,6 +33,7 @@ class Flight_Model extends MY_Model {
    * @return [array] A collection of flights
    */
   public function getFlightsByAirport($request) {
+    $this->config['numHours'] = '6';
     $result = $this->apiCall('airport/status/'.
       $request['arrivalAirportCode'].'/'.
       $request['direction'].'/'.
