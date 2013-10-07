@@ -31,7 +31,7 @@ class Flight extends MY_Controller {
 
       if($this->form_validation->run() != false) {
         $request = array (
-          'carrierCode' => $this->input->post('carrierCode'),
+		  'carrierCode' => $this->get_iata_code($this->input->post('carrierCode')),
           'flightNo' => $this->input->post('flightNo'),
           'date' => $this->_splitDate($this->input->post('date'))
         );
@@ -42,6 +42,8 @@ class Flight extends MY_Controller {
       }
     }
     $data['airlines'] = $this->_getAllAirlines();
+	/** get controller name(eg. "flight"). **/
+    $data['controller_name'] = strtolower(get_class());
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flight by Flight Number');
     $this->template->write_view('content', 'flight/searchByFlight', $data, TRUE);
@@ -60,7 +62,7 @@ class Flight extends MY_Controller {
 
       if($this->form_validation->run() != false) {
         $request = array (
-          'arrivalAirportCode' => $this->input->post('arrivalAirportCode'),
+		  'arrivalAirportCode' => $this->get_iata_code($this->input->post('arrivalAirportCode')),
           'direction' => $this->input->post('direction'),
           'date' => $this->_splitDate($this->input->post('date')),
           'hour' => $this->input->post('hour')
@@ -72,6 +74,8 @@ class Flight extends MY_Controller {
       }
     }
     $data['airports'] = $this->_getAllAirports();
+	/** get controller name(eg. "flight"). **/
+    $data['controller_name'] = strtolower(get_class());
     $this->addDatePickerFiles();
     $this->template->write('title', 'Search Flights by Airport');
     $this->template->write_view('content', 'flight/searchByAirport', $data, TRUE);
@@ -223,5 +227,42 @@ class Flight extends MY_Controller {
     return checkdate($date['month'], $date['day'], $date['year']);
   }
 
+   /**
+   * 
+   * get Airport Code autocomplete result
+   * @param  void
+   * @return json
+   */
+
+  public function suggest_airport()
+  {
+  	$q = $this->input->post('term');
+  	$this->load->model('Airport_Model', 'airport');
+  	$suggestions = $this->airport->get_search_suggestions_airport($q , 30);
+
+  	echo json_encode($suggestions);
+  }
+
+
+  /**
+   * 
+   * get Carrier Code autocomplete result
+   * @param  void
+   * @return json
+   */
+  public function suggest_flight()
+  {
+  	$q = $this->input->post('term');
+  	$this->load->model('Airline_Model', 'airline');
+  	$suggestions = $this->airline->get_search_suggestions_airline($q , 30);
+  	echo json_encode($suggestions);
+  }
+  
+  public function get_iata_code($string) {
+	$iata = explode('(' , $string);
+	$iata = explode(')' , $iata[1]);
+	return $iata[0];
+  }
+ 
 }
 

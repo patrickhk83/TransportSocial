@@ -1,9 +1,11 @@
-<html>
-<head>
-  <title></title>
-</head>
-<body>
-  <form action="/flight/searchByAirport" method="post">
+
+  	<script type="text/javascript">
+		$(document).ready(function(){
+			enable_search_airport("<?php echo site_url("$controller_name/suggest_airport");?>");
+
+		});
+	</script>
+  <form action="<?php echo site_url("$controller_name/searchByAirport"); ?>" method="post">
     <?php if(validation_errors()) { ?>
       <div class="alert alert-danger">
         <?php echo validation_errors();  ?>
@@ -11,11 +13,7 @@
     <?php } ?>
     <div class="form-group">
       <label for="arrivalAirportCode">Airport Code</label>
-      <select class="form-control" id="arrivalAirportCode" name="arrivalAirportCode">
-        <?php foreach($airports as $airport) { ?>
-          <option value="<?php echo $airport->iata; ?>"><?php echo $airport->name." (".$airport->iata.")"; ?></option>
-        <?php } ?>
-      </select>
+ 		<?php echo form_input(array('name'=>'arrivalAirportCode' , 'id'=>'arrivalAirportCode' , 'class'=>'form-control' , 'value'=>''));?>
     </div>
     <div class="form-group">
       <label for="Date">Date</label>
@@ -26,7 +24,12 @@
     </div>
     <div class="form-group">
       <label for="hour">Hour of Day</label>
-      <input type="text" class="form-control" name="hour" value="<?php echo set_value('hour'); ?>">
+      <select class="form-control" name="hour" id="hour">
+      	<option value="0">0000-0600</option>
+      	<option value="6">0600-1200</option>
+      	<option value="12">1200-1800</option>
+      	<option value="18">1800-0000</option>
+      </select>
     </div>
     <div class="form-group">
       <label class="radio-inline">
@@ -40,5 +43,3 @@
       <input type="submit" class="btn btn-primary" value="Search">
     </div>
   </form>
-</body>
-</html>

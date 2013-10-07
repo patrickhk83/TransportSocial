@@ -9,6 +9,13 @@
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="<?php echo site_url('/assets/js/tooltip.js'); ?>"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	
+	<!-- Added by David Ming 2013/10/5 -->
+    <link rel="stylesheet" href="<?php echo base_url();?>assets/css/jquery-ui.css" />
+<!-- Added by David Ming 2013/10/5 -->
+	<script src="<?php echo base_url();?>assets/js/jquery-ui.js"></script>
+	
+	
     <?php if ($_scripts) { echo $_scripts; } ?>
   </head>
   <body>

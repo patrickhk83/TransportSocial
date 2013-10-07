@@ -1,9 +1,10 @@
-<html>
-<head>
-  <title></title>
-</head>
-<body>
-  <form action="/flight/searchByFlight" method="post">
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			enable_search_flight("<?php echo site_url("$controller_name/suggest_flight");?>");
+		});
+	</script>
+  <form action="<?php echo site_url("$controller_name/searchByFlight"); ?>" method="post">
     <?php if(validation_errors()) { ?>
       <div class="alert alert-danger">
         <?php echo validation_errors(); ?>
@@ -11,11 +12,7 @@
     <?php } ?>
     <div class="form-group">
       <label for="carrierCode">Carrier Code</label>
-      <select class="form-control" id="carrierCode" name="carrierCode">
-        <?php foreach($airlines as $airline) { ?>
-          <option value="<?php echo $airline->iata; ?>"><?php echo $airline->name." (".$airline->iata.")"; ?></option>
-        <?php } ?>
-      </select>
+      <?php echo form_input(array('name'=>'carrierCode' , 'id'=>'carrierCode' , 'class'=>'form-control' , 'value'=>''));?>
     </div>
     <div class="form-group">
       <label for="FlightNo">Flight Number</label>
@@ -32,5 +29,3 @@
       <input type="submit" class="btn btn-primary" value="Search">
     </div>
   </form>
-</body>
-</html>

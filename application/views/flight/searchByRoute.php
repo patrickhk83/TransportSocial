@@ -1,8 +1,4 @@
-<html>
-<head>
-  <title></title>
-</head>
-<body>
+
   <form action="/flight/searchByRoute" method="post">
     <?php if(validation_errors()) { ?>
       <div class="alert alert-danger">
@@ -36,5 +32,4 @@
       <input type="submit" class="btn btn-primary" value="Search">
     </div>
   </form>
-</body>
-</html>
+
