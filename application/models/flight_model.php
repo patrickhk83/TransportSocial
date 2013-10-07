@@ -5,6 +5,7 @@ class Flight_Model extends MY_Model {
   public function __construct()
   {
     parent::__construct('flightstatus');
+    $this->config['extendedOptions'] = 'useInlinedReferences';
   }
   /**
    * Retrieve a single flight by the flight number
