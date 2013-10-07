@@ -3,6 +3,7 @@
 class MY_Model extends CI_Model {
 
     public $type = '';
+    public $config = '';
 
     function __construct($type = null) {
       parent::__construct();
@@ -18,6 +19,10 @@ class MY_Model extends CI_Model {
       $this->rest->initialize(array(
         'server' => 'https://api.flightstats.com/flex/'.$this->type.'/rest/v2/json/'
       ));
+      $this->config = array(
+        'appId' => 'bf28d4a0',
+        'appKey' => 'a7ca1c2a0eab46e9d097f4aa39168ac7',
+      );
     }
 
     /**
@@ -26,11 +31,7 @@ class MY_Model extends CI_Model {
      * @return [object] A collection of information related to the $function
      */
     function apiCall($function) {
-      return $this->rest->get($function, array(
-        'appId' => 'bf28d4a0',
-        'appKey' => 'a7ca1c2a0eab46e9d097f4aa39168ac7',
-        'extendedOptions' => 'useInlinedReferences'
-      ));
+      return $this->rest->get($function, $this->config);
     }
 }
 
