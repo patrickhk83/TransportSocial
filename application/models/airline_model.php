@@ -7,18 +7,7 @@ class Airline_Model extends CI_Model {
     parent::__construct();
   }
 
-  public function getAll() {
-    $this->db->select('name, iata');
-    $this->db->where('iata !=', '');
-    $this->db->order_by('name asc');
-    $result = $this->db->get('airlines')->result();
-
-    return $result;
-  }
-
-
     /**
-   * //Added by David Ming 2013/10/5
    * get airline name and iata from db
    * @param unknown $search
    * @param number $limit
