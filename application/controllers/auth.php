@@ -89,7 +89,13 @@ class Auth extends MY_Controller {
 				'class' => 'form-control',
 				'type' => 'password',
 			);
-
+			$this->load->model('Airport_Model' , 'airport');
+			$this->data['countries'] = $this->airport->get_countries();
+			$this->data['controller_name'] = strtolower(get_class());
+			$this->template->add_css('assets/css/signup.css');
+			$this->template->add_css('assets/css/datepicker.css');
+			$this->template->add_js('assets/js/bootstrap-datepicker.js');
+			$this->template->add_js('assets/js/manageuser.js');
 			$this->template->write_view('content', 'auth/login', $this->data);
 			$this->template->render();
 		}
@@ -735,6 +741,59 @@ class Auth extends MY_Controller {
 		{
 			return FALSE;
 		}
+	}
+
+
+/**
+ * Registration New User
+*/
+	function signup_user()
+	{
+/*
+		if ($this->ion_auth->logged_in())
+		{
+			//redirect('auth', 'refresh');
+			echo json_encode(array('success'=>false ,
+					'message'=>lang('create_user_error_adding_updating').' '.
+					$$this->input->post('fname').' '.$this->input->post('lname')));
+			return;
+		}
+*/
+
+		$username = strtolower($this->input->post('fname')).' '.strtolower($this->input->post('lname'));
+		$email    = strtolower($this->input->post('email'));
+		$password = $this->input->post('passwords');
+
+			$additional_data = array(
+				'first_name' => $this->input->post('fname'),
+				'last_name'  => $this->input->post('lname'),
+				'company'    => $this->input->post('occupation'),
+				'phone'      => $this->input->post('phone'),
+				'country' => $this->input->post('country'),
+				'birthday' => $this->input->post('birthday'),
+				'about_me' => $this->input->post('about_me'),
+				'hobbies' => $this->input->post('hobbies'),
+				'musics' => $this->input->post('musics'),
+				'movies' => $this->input->post('movies'),
+				'books' => $this->input->post('books')
+			);
+
+		if ($this->ion_auth->register($username, $password, $email, $additional_data))
+		{
+			//check to see if we are creating the user
+			//redirect them back to the admin page
+			$this->session->set_flashdata('message', $this->ion_auth->messages());
+			echo json_encode(array('success'=>true ,
+					'message'=>$this->ion_auth->message()));
+		}
+		else
+		{
+			//display the create user form
+			//set the flash data error message if there is one
+			echo json_encode(array('success'=>false ,
+					'message'=>$this->ion_auth->errors()));
+		}
+
 	}
 
 }

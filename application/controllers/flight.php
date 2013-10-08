@@ -228,7 +228,7 @@ class Flight extends MY_Controller {
   }
 
    /**
-   * 
+   *
    * get Airport Code autocomplete result
    * @param  void
    * @return json
@@ -245,7 +245,7 @@ class Flight extends MY_Controller {
 
 
   /**
-   * 
+   *
    * get Carrier Code autocomplete result
    * @param  void
    * @return json
@@ -257,12 +257,12 @@ class Flight extends MY_Controller {
   	$suggestions = $this->airline->get_search_suggestions_airline($q , 30);
   	echo json_encode($suggestions);
   }
-  
+
   public function get_iata_code($string) {
 	$iata = explode('(' , $string);
 	$iata = explode(')' , $iata[1]);
 	return $iata[0];
   }
- 
+
 }
 

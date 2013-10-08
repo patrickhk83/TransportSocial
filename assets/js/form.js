@@ -10,7 +10,6 @@ $(document).ready(function() {
 
 
 /**
- * Added by David Ming 2013/10/5
  * Enable autocomplete of Airport Code field
  * @param suggest_url
  */
@@ -40,7 +39,6 @@ function enable_search_airport(suggest_url)
 }
 
 /**
- * Added by David Ming 2013/10/5
  * Enable autocomplete of Carrier Code
  * @param suggest_url
  */

@@ -15,7 +15,7 @@ class Airport_Model extends CI_Model {
 
     return $result;
   }
-  
+
    /**
    * //Added by David Ming 2013/10/5
    * get airport name and iata from db
@@ -46,5 +46,17 @@ class Airport_Model extends CI_Model {
   	return $suggestions;
 
   }
+
+  /**
+   Get all countries information
+  */
+  public function get_countries()
+  {
+  	$this->db->from('countries');
+  	$this->db->order_by('country_name' , 'asc');
+  	$query = $this->db->get()->result();
+  	return $query;
+  }
+
 }
 
