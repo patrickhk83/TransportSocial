@@ -72,12 +72,12 @@ class Flight_Model extends MY_Model {
   public function getFlights($userId = null, $flightId = null) {
     $this->db->distinct();
     $this->db->select('flight.*, airlines.*');
-    $this->db->select('d.iata as dep_iata, dep.name as depName');
-    $this->db->select('arivIata as arivIata, ariv.name as arivName');
+    $this->db->select('dep.iata as depIata, dep.name as depName');
+    $this->db->select('ariv.iata as arivIata, ariv.name as arivName');
     $this->db->from('flight');
     $this->db->join('airlines', 'flight.carrierFsCode = airlines.iata');
-    $this->db->join('airports as dep', 'flight.departureAirportCode = d.iata');
-    $this->db->join('airports as ariv', 'flight.arrivalAirportCode = a.iata');
+    $this->db->join('airports as dep', 'flight.departureAirportCode = dep.iata');
+    $this->db->join('airports as ariv', 'flight.arrivalAirportCode = ariv.iata');
     if(isset($userId)) {
       $this->db->join('flight_user', 'flight_user.flightId = flight.flightId');
       $this->db->where('flight_user.userId', $userId);
