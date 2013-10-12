@@ -71,11 +71,13 @@ class Flight_Model extends MY_Model {
 
   public function getFlights($userId = null, $flightId = null) {
     $this->db->distinct();
-    $this->db->select('flight.*, airlines.*, d.iata as d_iata, a.iata as a_iata, d.name as d_name, a.name as a_name');
+    $this->db->select('flight.*, airlines.*');
+    $this->db->select('d.iata as dep_iata, dep.name as depName');
+    $this->db->select('arivIata as arivIata, ariv.name as arivName')
     $this->db->from('flight');
     $this->db->join('airlines', 'flight.carrierFsCode = airlines.iata');
-    $this->db->join('airports as d', 'flight.departureAirportCode = d.iata');
-    $this->db->join('airports as a', 'flight.arrivalAirportCode = a.iata');
+    $this->db->join('airports as dep', 'flight.departureAirportCode = d.iata');
+    $this->db->join('airports as ariv', 'flight.arrivalAirportCode = a.iata');
     if(isset($userId)) {
       $this->db->join('flight_user', 'flight_user.flightId = flight.flightId');
       $this->db->where('flight_user.userId', $userId);
@@ -101,11 +103,11 @@ class Flight_Model extends MY_Model {
       $savedFlight->carrier = new stdClass();
       $savedFlight->carrier->fs = $flight->iata;
       $savedFlight->carrier->name = $flight->name;
-      $savedFlight->arrivalAirport->fs = $flight->iata;
-      $savedFlight->arrivalAirport->name = $flight->a_name;
+      $savedFlight->arrivalAirport->fs = $flight->arivIata;
+      $savedFlight->arrivalAirport->name = $flight->arivName;
       $savedFlight->departureAirport = new stdClass();
-      $savedFlight->departureAirport->fs = $flight->d_iata;
-      $savedFlight->departureAirport->name = $flight->d_name;
+      $savedFlight->departureAirport->fs = $flight->depIata;
+      $savedFlight->departureAirport->name = $flight->depName;
       $savedFlight->arrivalDate = new stdClass();
       $savedFlight->arrivalDate->dateLocal = $flight->arrivalTime;
       $savedFlight->departureDate = new stdClass();
@@ -171,6 +173,79 @@ class Flight_Model extends MY_Model {
     }
   }
 
+  public function getUserFlights($userId = null) {
+    $this->db->select('flightId, userId, privacy');
+    if(isset($userId)) {
+      $this->db->where('userId', $userId);
+    }
+    return $this->db->get('flight_user')->result();
+  }
+
+  /**
+   * Check which flights are saved or not
+   * @param  [object]  $flights - A collection of flights
+   * @param  [string]  $userId
+   * @return [object] A collection of flights
+   */
+  public function isFlightSaved($flights, $single, $userId = null) {
+    return $this->addInformation($flights, $single, "checkIfSaved", $userId);
+  }
+
+  public function appendPassengersToFlight($flights, $single, $userId = null) {
+    return $this->addInformation($flights, $single, "getPassengers", $userId);
+  }
+
+  private function getPassengers($flight, $userFlights, $userId = null) {
+    $flight->totalPassengers = array();
+    foreach($userFlights as $userFlight) {
+      if($this->isAllowedToViewPassenger($userId, $userFlight)) {
+        if($flight->flightId == $userFlight->flightId) {
+          array_push($flight->totalPassengers, $this->ion_auth->user($userFlight->userId)->row());
+        }
+      }
+    }
+    return $flight;
+  }
+
+  private function checkIfSaved($flight, $userFlights, $userId = null) {
+    $flight->isSaved = false;
+    if(count((array)$userFlights) > 0) {
+      foreach($userFlights as $userFlight) {
+        if($flight->flightId == $userFlight->flightId) {
+          $flight->isSaved = true;
+          break;
+        }
+      }
+    }
+  }
+
+  private function addInformation($flights, $single, $functionName, $userId) {
+    $userFlights = $this->getUserFlights();
+    if($single) {
+      $flight = $flights;
+      $this->{$functionName}($flight, $userFlights, $userId);
+    }
+    else {
+      foreach($flights as $flight) {
+        $this->{$functionName}($flight, $userFlights, $userId);
+      }
+    }
+    return $flights;
+  }
+
+
+  private function isAllowedToViewPassenger($userId, $userFlight) {
+    if($userFlight->privacy == ONLY_YOU && $userFlight->userId == $userId) {
+      return true;
+    }
+    else if($userFlight->privacy == OTHER_USERS && isset($userId)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   /**
    * Prepare Date for the api yyyy/mm/dd
    * @param  [array] $date
@@ -195,78 +270,6 @@ class Flight_Model extends MY_Model {
     $query = $this->db->get($table);
 
     return ($query->num_rows() > 0 ? true : false);
-  }
-
-  public function getUserFlights($userId = null) {
-    $this->db->select('flightId, userId, privacy');
-    if(isset($userId)) {
-      $this->db->where('userId', $userId);
-    }
-    return $this->db->get('flight_user')->result();
-  }
-
-  public function addInformation($flights, $single, $functionName, $userId) {
-    $userFlights = $this->getUserFlights();
-    if($single) {
-      $flight = $flights;
-      $this->{$functionName}($flight, $userFlights, $userId);
-    }
-    else {
-      foreach($flights as $flight) {
-        $this->{$functionName}($flight, $userFlights, $userId);
-      }
-    }
-    return $flights;
-  }
-
-  /**
-   * Check which flights are saved or not
-   * @param  [object]  $flights - A collection of flights
-   * @param  [string]  $userId
-   * @return [object] A collection of flights
-   */
-  public function isFlightSaved($flights, $single, $userId = null) {
-    return $this->addInformation($flights, $single, "checkIfSaved", $userId);
-  }
-
-  public function appendPassengersToFlight($flights, $single, $userId = null) {
-    return $this->addInformation($flights, $single, "getPassengers", $userId);
-  }
-
-  public function getPassengers($flight, $userFlights, $userId = null) {
-    $flight->totalPassengers = array();
-    foreach($userFlights as $userFlight) {
-      if($this->isAllowedToViewPassenger($userId, $userFlight)) {
-        if($flight->flightId == $userFlight->flightId) {
-          array_push($flight->totalPassengers, $this->ion_auth->user($userFlight->userId)->row());
-        }
-      }
-    }
-    return $flight;
-  }
-
-  public function checkIfSaved($flight, $userFlights, $userId = null) {
-    $flight->isSaved = false;
-    if(count((array)$userFlights) > 0) {
-      foreach($userFlights as $userFlight) {
-        if($flight->flightId == $userFlight->flightId) {
-          $flight->isSaved = true;
-          break;
-        }
-      }
-    }
-  }
-
-  private function isAllowedToViewPassenger($userId, $userFlight) {
-    if($userFlight->privacy == ONLY_YOU && $userFlight->userId == $userId) {
-      return true;
-    }
-    else if($userFlight->privacy == OTHER_USERS && isset($userId)) {
-      return true;
-    }
-    else {
-      return false;
-    }
   }
 }
 
