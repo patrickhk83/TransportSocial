@@ -73,7 +73,7 @@ class Flight_Model extends MY_Model {
     $this->db->distinct();
     $this->db->select('flight.*, airlines.*');
     $this->db->select('d.iata as dep_iata, dep.name as depName');
-    $this->db->select('arivIata as arivIata, ariv.name as arivName')
+    $this->db->select('arivIata as arivIata, ariv.name as arivName');
     $this->db->from('flight');
     $this->db->join('airlines', 'flight.carrierFsCode = airlines.iata');
     $this->db->join('airports as dep', 'flight.departureAirportCode = d.iata');
