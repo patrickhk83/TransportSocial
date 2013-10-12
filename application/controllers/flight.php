@@ -14,7 +14,7 @@ class Flight extends MY_Controller {
   /**
    * Adds the required files for the date picker
    */
-  public function addDatePickerFiles() {
+  private function addDatePickerFiles() {
     $this->template->add_js('assets/js/bootstrap-datepicker.js');
     $this->template->add_js('assets/js/form.js');
     $this->template->add_css('assets/css/datepicker.css');
@@ -27,17 +27,17 @@ class Flight extends MY_Controller {
     if(isMethod('post')) {
       $this->form_validation->set_rules('carrierCode', 'Carrier Code', 'required|trim');
       $this->form_validation->set_rules('flightNo', 'Flight Number', 'required|trim|numeric');
-      $this->form_validation->set_rules('date', 'Date','required|trim|callback__isDate');
+      $this->form_validation->set_rules('date', 'Date','required|trim|callback_isDate');
 
       if($this->form_validation->run() != false) {
         $request = array (
 		  'carrierCode' => $this->get_iata_code($this->input->post('carrierCode')),
           'flightNo' => $this->input->post('flightNo'),
-          'date' => $this->_splitDate($this->input->post('date'))
+          'date' => $this->splitDate($this->input->post('date'))
         );
 
         $result = $this->flight->getFlightByNumber($request);
-        $this->_renderFlightResults($result);
+        $this->renderFlightResults($result);
         return;
       }
     }
@@ -54,19 +54,19 @@ class Flight extends MY_Controller {
     if(isMethod('post')) {
       $this->form_validation->set_rules('arrivalAirportCode', 'Arrival Airport Code', 'required|trim');
       $this->form_validation->set_rules('direction', 'Direction', 'required|trim');
-      $this->form_validation->set_rules('date', 'Date','required|trim|callback__isDate');
+      $this->form_validation->set_rules('date', 'Date','required|trim|callback_isDate');
       $this->form_validation->set_rules('hour', 'Hour', 'required|trim|numeric');
 
       if($this->form_validation->run() != false) {
         $request = array (
 		  'arrivalAirportCode' => $this->get_iata_code($this->input->post('arrivalAirportCode')),
           'direction' => $this->input->post('direction'),
-          'date' => $this->_splitDate($this->input->post('date')),
+          'date' => $this->splitDate($this->input->post('date')),
           'hour' => $this->input->post('hour')
         );
 
         $result = $this->flight->getFlightsByAirport($request);
-        $this->_renderFlightResults($result);
+        $this->renderFlightResults($result);
         return;
       }
     }
@@ -84,17 +84,17 @@ class Flight extends MY_Controller {
     if(isMethod('post')) {
       $this->form_validation->set_rules('departureAirportCode', 'Departure Airport Code', 'required|trim');
       $this->form_validation->set_rules('arrivalAirportCode', 'Arrival Airport Code', 'required|trim');
-      $this->form_validation->set_rules('date', 'Date','required|trim|callback__isDate');
+      $this->form_validation->set_rules('date', 'Date','required|trim|callback_isDate');
 
       if($this->form_validation->run() != false) {
         $request = array (
           'arrivalAirportCode' => $this->input->post('arrivalAirportCode'),
           'departureAirportCode' => $this->input->post('departureAirportCode'),
-          'date' => $this->_splitDate($this->input->post('date'))
+          'date' => $this->splitDate($this->input->post('date'))
         );
 
         $result = $this->flight->getFlightsByRoute($request);
-        $this->_renderFlightResults($result);
+        $this->renderFlightResults($result);
         return;
       }
     }
@@ -153,8 +153,8 @@ class Flight extends MY_Controller {
   public function savedFlights($userId) {
     if(isset($this->user->id) && $this->user->id == $userId) {
       $userId = (isset($this->user) ? $this->user->id : null);
-      $flights = $this->flight->_appendPassengersToFlight($this->flight->getAllSavedFlights($userId), $userId);
-      $data['flights'] = $this->flight->_isSaved($flights, $userId);
+      $flights = $this->flight->getAllSavedFlights($userId);
+      $data['flights'] = $this->addExtraInformation($flights, false, $userId, true);
       $data['message'] = $this->session->flashdata('message');
       $data['message_class'] = $this->session->flashdata('message_class');
       $this->template->add_js('/assets/js/information.js');
@@ -167,14 +167,25 @@ class Flight extends MY_Controller {
     }
   }
 
-  public function _getAllAirports() {
-    $this->load->model('Airport_Model', 'airport');
-    return $this->airport->getAll();
+  public function addExtraInformation($result, $single, $userId = null, $fromDatabase = false) {
+    if(!$fromDatabase) {
+      $result = ($single ? $result->flightStatus : $result->flightStatuses);
+    }
+    if(isset($this->user)) {
+      $result = $this->flight->isFlightSaved($result, $single, $this->user->id);
+      $userId = $this->user->id;
+    }
+    $result = $this->flight->appendPassengersToFlight($result, $single, $userId);
+
+    return $result;
   }
 
-  public function _getAllAirlines() {
-    $this->load->model('Airline_Model', 'airline');
-    return $this->airline->getAll();
+  public function viewFlight($flightId) {
+    $result = $this->flight->viewFlight($flightId);
+    $data['flight'] = $this->addExtraInformation($result, true);
+    $this->template->write('title', 'View Flight '.$flightId);
+    $this->template->write_view('content', 'flight/viewFlight', $data, FALSE);
+    $this->template->render();
   }
 
   /**
@@ -182,7 +193,7 @@ class Flight extends MY_Controller {
    * @param  [string] $date - full date
    * @return [array] month, day, year
    */
-  public function _splitDate($date) {
+  private function splitDate($date) {
     $date = explode('-', $date);
     $date = array(
       'day' => $date[0],
@@ -196,15 +207,8 @@ class Flight extends MY_Controller {
    * Render the flight result views
    * @param  [array] $result
    */
-  public function _renderFlightResults($result) {
-    $userId = (isset($this->user) ? $this->user->id : null);
-    $result = $this->flight->_appendPassengersToFlight($result->flightStatuses, $userId);
-    if(isset($this->user)) {
-      $data['flights'] = $this->flight->_isSaved($result, $this->user->id);
-    }
-    else {
-      $data['flights'] = $result;
-    }
+  private function renderFlightResults($result) {
+    $data['flights'] = $this->addExtraInformation($result, false);
     $this->template->write('title', 'Flight Results');
     $this->template->write_view('content', 'flight/result', $data, TRUE);
     $this->template->render();
@@ -215,8 +219,8 @@ class Flight extends MY_Controller {
    * @param  [array]  $date
    * @return boolean
    */
-  public function _isDate($date) {
-    $date = $this->_splitDate($date);
+  public function isDate($date) {
+    $date = $this->splitDate($date);
     return checkdate($date['month'], $date['day'], $date['year']);
   }
 
@@ -236,7 +240,6 @@ class Flight extends MY_Controller {
   	echo json_encode($suggestions);
   }
 
-
   /**
    *
    * get Carrier Code autocomplete result
@@ -251,10 +254,10 @@ class Flight extends MY_Controller {
   	echo json_encode($suggestions);
   }
 
-  public function get_iata_code($string) {
-	$iata = explode('(' , $string);
-	$iata = explode(')' , $iata[1]);
-	return $iata[0];
+  private function get_iata_code($string) {
+    $iata = explode('(' , $string);
+  	$iata = explode(')' , $iata[1]);
+  	return $iata[0];
   }
 
 }
