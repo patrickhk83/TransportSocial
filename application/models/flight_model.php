@@ -209,11 +209,11 @@ class Flight_Model extends MY_Model {
     $userFlights = $this->getUserFlights();
     if($single) {
       $flight = $flights;
-      call_user_func_array(array($this, $functionName), array($flight, $userFlights, $userId));
+      $this->{$functionName}($flight, $userFlights, $userId);
     }
     else {
       foreach($flights as $flight) {
-        $flight = call_user_func_array(array($this, $functionName), array($flight, $userFlights, $userId));
+        $this->{$functionName}($flight, $userFlights, $userId);
       }
     }
     return $flights;
