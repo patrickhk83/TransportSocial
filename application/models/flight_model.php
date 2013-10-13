@@ -69,55 +69,6 @@ class Flight_Model extends MY_Model {
     return $this->getFlights($userId, null);
   }
 
-  public function getFlights($userId = null, $flightId = null) {
-    $this->db->distinct();
-    $this->db->select('flight.*, airlines.*');
-    $this->db->select('dep.iata as depIata, dep.name as depName');
-    $this->db->select('ariv.iata as arivIata, ariv.name as arivName');
-    $this->db->from('flight');
-    $this->db->join('airlines', 'flight.carrierFsCode = airlines.iata');
-    $this->db->join('airports as dep', 'flight.departureAirportCode = dep.iata');
-    $this->db->join('airports as ariv', 'flight.arrivalAirportCode = ariv.iata');
-    if(isset($userId)) {
-      $this->db->join('flight_user', 'flight_user.flightId = flight.flightId');
-      $this->db->where('flight_user.userId', $userId);
-    }
-    if(isset($flightId)) {
-      $this->db->where('flight.flightId', $flightId);
-    }
-    $this->db->group_by('flight.flightNumber');
-    return $this->prepareFlightObjects($this->db->get()->result());
-  }
-
-  /**
-   * Convert Database Results into a collection of Flight objects
-   * @param  [object] $flights - Saved flights from the database
-   * @return [object] A collection of flight objects
-   */
-  public function prepareFlightObjects($flights) {
-    $savedFlights = array();
-    foreach($flights as $flight) {
-      $savedFlight = new stdClass();
-      $savedFlight->flightId = $flight->flightId;
-      $savedFlight->flightNumber = $flight->flightNumber;
-      $savedFlight->carrier = new stdClass();
-      $savedFlight->carrier->fs = $flight->iata;
-      $savedFlight->carrier->name = $flight->name;
-      $savedFlight->arrivalAirport->fs = $flight->arivIata;
-      $savedFlight->arrivalAirport->name = $flight->arivName;
-      $savedFlight->departureAirport = new stdClass();
-      $savedFlight->departureAirport->fs = $flight->depIata;
-      $savedFlight->departureAirport->name = $flight->depName;
-      $savedFlight->arrivalDate = new stdClass();
-      $savedFlight->arrivalDate->dateLocal = $flight->arrivalTime;
-      $savedFlight->departureDate = new stdClass();
-      $savedFlight->departureDate->dateLocal = $flight->departureTime;
-      $savedFlights[] = $savedFlight;
-    }
-
-    return $savedFlights;
-  }
-
   public function viewFlight($flightId) {
     return $this->getFlightById($flightId);
   }
@@ -179,6 +130,55 @@ class Flight_Model extends MY_Model {
       $this->db->where('userId', $userId);
     }
     return $this->db->get('flight_user')->result();
+  }
+
+  private function getFlights($userId = null, $flightId = null) {
+    $this->db->distinct();
+    $this->db->select('flight.*, airlines.*');
+    $this->db->select('dep.iata as depIata, dep.name as depName');
+    $this->db->select('ariv.iata as arivIata, ariv.name as arivName');
+    $this->db->from('flight');
+    $this->db->join('airlines', 'flight.carrierFsCode = airlines.iata');
+    $this->db->join('airports as dep', 'flight.departureAirportCode = dep.iata');
+    $this->db->join('airports as ariv', 'flight.arrivalAirportCode = ariv.iata');
+    if(isset($userId)) {
+      $this->db->join('flight_user', 'flight_user.flightId = flight.flightId');
+      $this->db->where('flight_user.userId', $userId);
+    }
+    if(isset($flightId)) {
+      $this->db->where('flight.flightId', $flightId);
+    }
+    $this->db->group_by('flight.flightNumber');
+    return $this->prepareFlightObjects($this->db->get()->result());
+  }
+
+  /**
+   * Convert Database Results into a collection of Flight objects
+   * @param  [object] $flights - Saved flights from the database
+   * @return [object] A collection of flight objects
+   */
+  private function prepareFlightObjects($flights) {
+    $savedFlights = array();
+    foreach($flights as $flight) {
+      $savedFlight = new stdClass();
+      $savedFlight->flightId = $flight->flightId;
+      $savedFlight->flightNumber = $flight->flightNumber;
+      $savedFlight->carrier = new stdClass();
+      $savedFlight->carrier->fs = $flight->iata;
+      $savedFlight->carrier->name = $flight->name;
+      $savedFlight->arrivalAirport->fs = $flight->arivIata;
+      $savedFlight->arrivalAirport->name = $flight->arivName;
+      $savedFlight->departureAirport = new stdClass();
+      $savedFlight->departureAirport->fs = $flight->depIata;
+      $savedFlight->departureAirport->name = $flight->depName;
+      $savedFlight->arrivalDate = new stdClass();
+      $savedFlight->arrivalDate->dateLocal = $flight->arrivalTime;
+      $savedFlight->departureDate = new stdClass();
+      $savedFlight->departureDate->dateLocal = $flight->departureTime;
+      $savedFlights[] = $savedFlight;
+    }
+
+    return $savedFlights;
   }
 
   /**

@@ -167,9 +167,12 @@ class Flight extends MY_Controller {
     }
   }
 
-  public function addExtraInformation($result, $single, $userId = null, $fromDatabase = false) {
+  public function addExtraInformation($result, $single, $userId = null, $fromDatabase) {
     if(!$fromDatabase) {
       $result = ($single ? $result->flightStatus : $result->flightStatuses);
+      if(count(array($result)) == 0) {
+        $result = array();
+      }
     }
     if(isset($this->user)) {
       $result = $this->flight->isFlightSaved($result, $single, $this->user->id);
@@ -182,7 +185,7 @@ class Flight extends MY_Controller {
 
   public function viewFlight($flightId) {
     $result = $this->flight->viewFlight($flightId);
-    $data['flight'] = $this->addExtraInformation($result, true);
+    $data['flight'] = $this->addExtraInformation($result, true, null, false);
     $this->template->write('title', 'View Flight '.$flightId);
     $this->template->write_view('content', 'flight/viewFlight', $data, FALSE);
     $this->template->render();
@@ -208,7 +211,7 @@ class Flight extends MY_Controller {
    * @param  [array] $result
    */
   private function renderFlightResults($result) {
-    $data['flights'] = $this->addExtraInformation($result, false);
+    $data['flights'] = $this->addExtraInformation($result, false, null, false);
     $this->template->write('title', 'Flight Results');
     $this->template->write_view('content', 'flight/result', $data, TRUE);
     $this->template->render();
