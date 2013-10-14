@@ -42,6 +42,7 @@
           <?php endif; ?>
         </div>
       <?php endif; ?>
+      <a class="btn btn-primary" href="/flight/viewFlight/<?php echo $flight->flightId; ?>">View</a>
     </li>
   <?php endforeach; ?>
   </div>
