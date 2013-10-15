@@ -47,16 +47,7 @@ class Airport_Model extends CI_Model {
 
   }
 
-  /**
-   Get all countries information
-  */
-  public function get_countries()
-  {
-  	$this->db->from('countries');
-  	$this->db->order_by('country_name' , 'asc');
-  	$query = $this->db->get()->result();
-  	return $query;
-  }
+
 
 }
 

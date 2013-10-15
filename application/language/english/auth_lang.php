@@ -92,6 +92,19 @@ $lang['create_user_google']								= 'Google+: ';
 $lang['create_user_password_must_match']				= 'Passwords do not match';
 $lang['create_user_validation_location_label']			= 'Country';
 $lang['create_user_error_adding_updating']				= 'Error adding/updating user';
+$lang['create_user_my_photo_info']						= 'My Photos';
+$lang['create_user_add_photo']							= 'Add files';
+$lang['create_user_successful_adding']					= 'You have successfully added your account.';
+$lang['create_user_error_adding_updating'] 				= 'Error adding your account.';
+
+
+//My Profile
+$lang['my_profile_about_me']							= 'About Me';
+$lang['my_profile_hobbies']								= 'Hobbies';
+$lang['my_profile_musics']								= 'Favorite Musics';
+$lang['my_profile_movies']								= 'Favorite Movies';
+$lang['my_profile_books']								= 'Favorite Books';
+$lang['my_profile_my_photos']							= 'My Photos';
 
 // Edit User
 $lang['edit_user_heading']                           = 'Edit User';

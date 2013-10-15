@@ -89,13 +89,18 @@ class Auth extends MY_Controller {
 				'class' => 'form-control',
 				'type' => 'password',
 			);
-			$this->load->model('Airport_Model' , 'airport');
-			$this->data['countries'] = $this->airport->get_countries();
+			$this->load->model('Useropt_Model' , 'useropt');
+			$this->data['countries'] = $this->useropt->get_countries();
 			$this->data['controller_name'] = strtolower(get_class());
 			$this->template->add_css('assets/css/signup.css');
 			$this->template->add_css('assets/css/datepicker.css');
+			$this->template->add_css('assets/css/jquery.fileupload.css');
+			$this->template->add_css('assets/css/jquery.fileupload-ui.css');
 			$this->template->add_js('assets/js/bootstrap-datepicker.js');
+			$this->template->add_js('assets/js/jquery.form.js');
+			$this->template->add_js('assets/js/jquery.validate.min.js');
 			$this->template->add_js('assets/js/manageuser.js');
+			$this->template->add_js('assets/js/modal.js');
 			$this->template->write_view('content', 'auth/login', $this->data);
 			$this->template->render();
 		}
@@ -750,6 +755,16 @@ class Auth extends MY_Controller {
 	function signup_user()
 	{
 /*
+		$person_id = $this->input->post('person_id');
+		if($person_id != 0 || $person_id != '')
+		{
+			if (!$this->ion_auth->logged_in())
+			{
+				redirect('auth', 'refresh');
+			}
+		}
+*/
+/*
 		if ($this->ion_auth->logged_in())
 		{
 			//redirect('auth', 'refresh');
@@ -759,11 +774,26 @@ class Auth extends MY_Controller {
 			return;
 		}
 */
+		$this->load->helper(array('form' , 'url'));
+		$this->load->library('form_validation');
+		//$this->lang->load('auth_lang' , 'english');
+		$this->form_validation->set_rules('fname', $this->lang->line('create_user_validation_fname_label'), 'required|xss_clean');
+		$this->form_validation->set_rules('lname', $this->lang->line('create_user_validation_lname_label'), 'required|xss_clean');
+		$this->form_validation->set_rules('email', $this->lang->line('create_user_validation_email_label'), 'required|valid_email');
+		$this->form_validation->set_rules('country', $this->lang->line('create_user_validation_phone_label'), 'required|xss_clean');
 
-		$username = strtolower($this->input->post('fname')).' '.strtolower($this->input->post('lname'));
-		$email    = strtolower($this->input->post('email'));
-		$password = $this->input->post('passwords');
+//		$this->form_validation->set_rules('password', $this->lang->line('create_user_validation_password_label'), 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
+//		$this->form_validation->set_rules('password_confirm', $this->lang->line('create_user_validation_password_confirm_label'), 'required');
 
+		if ($this->form_validation->run() == TRUE)
+		{
+			$username = strtolower($this->input->post('fname')).' '.strtolower($this->input->post('lname'));
+
+			$email    = strtolower($this->input->post('email'));
+
+			$password = $this->input->post('passwords');
+			$default_photo = $this->input->post('radio1');
+			//$default_photo = 1;
 			$additional_data = array(
 				'first_name' => $this->input->post('fname'),
 				'last_name'  => $this->input->post('lname'),
@@ -777,23 +807,264 @@ class Auth extends MY_Controller {
 				'movies' => $this->input->post('movies'),
 				'books' => $this->input->post('books')
 			);
+		}
 
-		if ($this->ion_auth->register($username, $password, $email, $additional_data))
+		if ($this->form_validation->run() == TRUE && $id = $this->ion_auth->register($username, $password, $email, $additional_data))
 		{
 			//check to see if we are creating the user
 			//redirect them back to the admin page
-			$this->session->set_flashdata('message', $this->ion_auth->messages());
-			echo json_encode(array('success'=>true ,
-					'message'=>$this->ion_auth->message()));
+			//$this->session->set_flashdata('message', $this->ion_auth->messages());
+			//echo json_encode(array('success'=>true , 'message'=>$this->ion_auth->message()));
+			$config['upload_path'] = "./assets/images/photos";
+			$config['allowed_types'] = "gif|jpg|png";
+			$config['max_width'] = '1920';
+			$config['max_height'] = '1080';
+			$config['remove_spaces'] = TRUE;
+			$config['encrypt_name'] = TRUE;
+			$config['file_name'] = "aa";
+			$this->load->library('upload' , $config);
+
+			$field_name = "files1";
+			$this->upload->do_upload($field_name);
+			$upload_data1 = $this->upload->data();
+
+			$config['upload_path'] = "./assets/images/photos";
+			$config['allowed_types'] = "gif|jpg|png";
+			$config['max_width'] = '1920';
+			$config['max_height'] = '1080';
+			$config['remove_spaces'] = TRUE;
+			$config['encrypt_name'] = TRUE;
+			$config['file_name'] = "aa";
+			$this->upload->initialize($config);
+
+			$field_name = "files2";
+			$this->upload->do_upload($field_name);
+			$upload_data2 = $this->upload->data();
+
+
+
+			$config['upload_path'] = "./assets/images/photos";
+			$config['allowed_types'] = "gif|jpg|png";
+			$config['max_width'] = '1920';
+			$config['max_height'] = '1080';
+			$config['remove_spaces'] = TRUE;
+			$config['encrypt_name'] = TRUE;
+			$config['file_name'] = "aa";
+			$this->upload->initialize($config);
+
+			$field_name = "files3";
+			$this->upload->do_upload($field_name);
+			$upload_data3 = $this->upload->data();
+
+
+
+			$config['upload_path'] = "./assets/images/photos";
+			$config['allowed_types'] = "gif|jpg|png";
+			$config['max_width'] = '1920';
+			$config['max_height'] = '1080';
+			$config['remove_spaces'] = TRUE;
+			$config['encrypt_name'] = TRUE;
+			$config['file_name'] = "aa";
+			$this->upload->initialize($config);
+
+			$field_name = "files4";
+			$this->upload->do_upload($field_name);
+			$upload_data4 = $this->upload->data();
+
+
+
+			$config['upload_path'] = "./assets/images/photos";
+			$config['allowed_types'] = "gif|jpg|png";
+			$config['max_width'] = '1920';
+			$config['max_height'] = '1080';
+			$config['remove_spaces'] = TRUE;
+			$config['encrypt_name'] = TRUE;
+			$config['file_name'] = "aa";
+			$this->upload->initialize($config);
+
+			$field_name = "files5";
+			$this->upload->do_upload($field_name);
+			$upload_data5 = $this->upload->data();
+
+			if($upload_data1['raw_name'] == "aa") $photo1 = $upload_data1['raw_name'];
+			else $photo1 = $upload_data1['raw_name'].$upload_data1['file_ext'];
+
+			if($upload_data2['raw_name'] == "aa") $photo2 = $upload_data2['raw_name'];
+			else $photo2 = $upload_data2['raw_name'].$upload_data2['file_ext'];
+
+			if($upload_data3['raw_name'] == "aa") $photo3 = $upload_data3['raw_name'];
+			else $photo3 = $upload_data3['raw_name'].$upload_data3['file_ext'];
+
+			if($upload_data4['raw_name'] == "aa") $photo4 = $upload_data4['raw_name'];
+			else $photo4 = $upload_data4['raw_name'].$upload_data4['file_ext'];
+
+			if($upload_data5['raw_name'] == "aa") $photo5 = $upload_data5['raw_name'];
+			else $photo5 = $upload_data5['raw_name'].$upload_data5['file_ext'];
+
+			//$this->photos_db($id , $photo1 , $photo2 , $photo3 , $photo4 , $photo5 , $default_photo);
+			$save_data = array(
+					'user_id' => $id,
+					'photo1' => $photo1,
+					'photo2' => $photo2,
+					'photo3' => $photo3,
+					'photo4' => $photo4,
+					'photo5' => $photo5,
+					'default_character' => $default_photo
+			);
+
+			//		$this->load->model('Useropt' , 'useropt');
+			$this->load->model('Useropt_Model' , 'useropt');
+
+			if($this->useropt->photos_db($save_data))
+				echo json_encode(array('success'=>true , 'message'=> $this->lang->line('create_user_successful_adding')));
+
 		}
 		else
 		{
 			//display the create user form
 			//set the flash data error message if there is one
-			echo json_encode(array('success'=>false ,
-					'message'=>$this->ion_auth->errors()));
+			//$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
+			//echo json_encode(array('success'=>true ,
+			//		'message'=>(validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')))));
+			//echo json_encode(array('success' => false , 'message' => (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : "Unknown error."))));
+			echo json_encode(array('success'=>false , 'message'=>(validation_errors() ? validation_errors() : $this->lang->line('create_user_error_adding_updating'))));
 		}
 
 	}
+
+
+
+/**
+ * Register in the users_photos of db
+ */
+	function photos_db($user_id , $data1 , $data2 , $data3 , $data4 , $data5 , $default)
+	{
+		if($default < 1) $default = 1;
+		$save_data = array(
+			'user_id' => $user_id,
+			'photo1' => $data1,
+			'photo2' => $data2,
+			'photo3' => $data3,
+			'photo4' => $data4,
+			'photo5' => $data5,
+			'default_character' => $default
+		);
+
+		$this->load->model('Useropt_Model' , 'useropt');
+		//$this->load->model('Airport_Model' , 'airport');
+		return $this->useropt->photos_db($save_data);
+
+	}
+
+
+	public function profile($user_id)
+	{
+		if(isset($this->user->id) && $this->user->id == $user_id)
+		{
+			$this->load->model('Useropt_Model' , 'useropt');
+
+			$data['countries'] = $this->useropt->get_countries();
+			$data['controller_name'] = strtolower(get_class());
+			$user_data = $this->useropt->get_user_info($user_id);
+			$data['user_data'] = $user_data;
+			$data['country'] = $this->useropt->get_user_country_name($user_data->country);
+			$photo = $this->useropt->get_photo_name($user_id);
+
+			if($photo->photo1 == "aa") $data['photo1'] = base_url('assets/images/default-profile-pic.png');
+			else $data['photo1'] = base_url("assets/images/photos/")."/".$photo->photo1;
+
+			if($photo->photo2 == "aa") $data['photo2'] = base_url('assets/images/default-profile-pic.png');
+			else $data['photo2'] = base_url("assets/images/photos/")."/".$photo->photo2;
+
+			if($photo->photo3 == "aa") $data['photo3'] = base_url('assets/images/default-profile-pic.png');
+			else $data['photo3'] = base_url("assets/images/photos/")."/".$photo->photo3;
+
+			if($photo->photo4 == "aa") $data['photo4'] = base_url('assets/images/default-profile-pic.png');
+			else $data['photo4'] = base_url("assets/images/photos/")."/".$photo->photo4;
+
+			if($photo->photo5 == "aa") $data['photo5'] = base_url('assets/images/default-profile-pic.png');
+			else $data['photo5'] = base_url("assets/images/photos/")."/".$photo->photo5;
+
+			switch($photo->default_character)
+			{
+				case 1:
+					$data['default_character'] = $data['photo1'];
+					break;
+				case 2:
+					$data['default_character'] = $data['photo2'];
+					break;
+				case 3:
+					$data['default_character'] = $data['photo3'];
+					break;
+				case 4:
+					$data['default_character'] = $data['photo4'];
+					break;
+				case 5:
+					$data['default_character'] = $data['photo5'];
+					break;
+			}
+			$this->template->add_css('assets/css/signup.css');
+			$this->template->add_css('assets/css/datepicker.css');
+			$this->template->add_css('assets/css/jquery.fileupload.css');
+			$this->template->add_css('assets/css/jquery.fileupload-ui.css');
+			$this->template->add_css('assets/js/fancybox/jquery.fancybox-1.3.4.css');
+
+			$this->template->add_js('assets/js/fancybox/jquery.fancybox-1.3.4.js');
+			$this->template->add_js('assets/js/bootstrap-datepicker.js');
+			$this->template->add_js('assets/js/jquery.form.js');
+			$this->template->add_js('assets/js/jquery.validate.min.js');
+			$this->template->add_js('assets/js/manageuser.js');
+			$this->template->add_js('assets/js/modal.js');
+			$this->template->write_view('content', 'auth/profile', $data);
+			$this->template->render();
+		}
+		else redirect("/");
+	}
+
+
+	public function get_user_dialog_info()
+	{
+		$person_id = $this->input->post('person_id');
+		$this->load->model('Useropt_Model' , 'useropt');
+		$results = $this->useropt->get_user_info($person_id);
+		$result_photos = $this->useropt->get_user_photos($person_id);
+		if($result_photos->photo1 == "aa") $photo1 = base_url("assets/images/default-profile-pic.png");
+		else $photo1 = base_url("assets/images/photos/$result_photos->photo1");
+
+		if($result_photos->photo2 == "aa") $photo2 = base_url("assets/images/default-profile-pic.png");
+		else $photo2 = base_url("assets/images/photos/$result_photos->photo2");
+
+		if($result_photos->photo3 == "aa") $photo3 = base_url("assets/images/default-profile-pic.png");
+		else $photo3 = base_url("assets/images/photos/$result_photos->photo3");
+
+		if($result_photos->photo4 == "aa") $photo4 = base_url("assets/images/default-profile-pic.png");
+		else $photo4 = base_url("assets/images/photos/$result_photos->photo4");
+
+		if($result_photos->photo5 == "aa") $photo5 = base_url("assets/images/default-profile-pic.png");
+		else $photo5 = base_url("assets/images/photos/$result_photos->photo5");
+
+		$data = array();
+
+		$data[] = $results->first_name;
+		$data[] = $results->last_name;
+		$data[] = $results->email;
+		$data[] = $results->country;
+		$data[] = $results->birthday;
+		$data[] = $results->company;
+		$data[] = $results->about_me;
+		$data[] = $results->hobbies;
+		$data[] = $results->musics;
+		$data[] = $results->movies;
+		$data[] = $results->books;
+		$data[] = $photo1;
+		$data[] = $photo2;
+		$data[] = $photo3;
+		$data[] = $photo4;
+		$data[] = $photo5;
+
+		echo json_encode($data);
+
+	}
+
 
 }

@@ -66,3 +66,18 @@ label.required
 	margin-left:5px;
 	padding:5px;
 }
+
+#user_photo_info
+{
+	float:left;
+	width:95%;
+	margin-left:5px;
+	padding:5px;
+}
+
+.thumb
+{
+	height:75px;
+	border:1px solid #000;
+	margin: 10px 5px 0 0;
+}
