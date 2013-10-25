@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 25, 2013 at 08:12 AM
+-- Generation Time: Oct 25, 2013 at 11:15 AM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.3.13
 
@@ -14042,14 +14042,6 @@ CREATE TABLE IF NOT EXISTS `users_photos` (
   `path` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=65 ;
-
---
--- Dumping data for table `users_photos`
---
-
-INSERT INTO `users_photos` (`id`, `user_id`, `path`) VALUES
-(64, 1, '/uploads/p_large_wWj3_3dc3000287735c42.jpg'),
-(63, 1, '/uploads/desert_sunrise_1206.jpg');
 
 --
 -- Constraints for dumped tables
