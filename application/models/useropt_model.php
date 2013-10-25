@@ -6,68 +6,38 @@ class Useropt_Model extends CI_Model
 		parent::__construct();
 	}
 
-
-	public function photos_db($data)
+	public function save_photo($user_id, $path)
 	{
-		$this->db->from('users_photos');
-		$this->db->where('user_id' , $data['user_id']);
-		$result = $this->db->get();
-		if($result->num_rows() == 1)
-		{
-			$this->db->where('user_id' , $data['user_id']);
-			return $this->db->update('users_photos' , $data);
-
-		}
-		else if($result->num_rows() == 0)
-		{
-			return $this->db->insert('users_photos' , $data);
-
-		}
-		else return false;
+		$data = array(
+			'user_id' => $user_id,
+			'path' => $path
+		);
+		$this->db->insert('users_photos' , $data);
+		return $this->db->insert_id();
 	}
 
-
-	public function get_user_info($user_id)
+	public function get_countries($country_code = null)
 	{
-		$this->db->from('users');
-		$this->db->where('id' , $user_id);
-		$results = $this->db->get()->row();
-		return $results;
+		$this->db->from('countries');
+		if(isset($country_code)) {
+			$this->db->where('country_code', $country_code);
+		}
+		return $this->db->get()->result();
 	}
 
-	public function get_photo_name($user_id)
+	public function get_photos($user_id, $photoId = null)
 	{
 		$this->db->from('users_photos');
 		$this->db->where('user_id' , $user_id);
-		$res = $this->db->get()->row();
-		return $res;
-	}
+		if(isset($photoId)) {
+			$this->db->where('id' , $photoId);
+			return $this->db->get()->row();
+		}
+		else {
+			return $this->db->get()->result();
+		}
 
-	public function get_user_country_name($country_code)
-	{
-		$this->db->from('countries');
-		$this->db->where('country_code' , $country_code);
-		$res = $this->db->get()->row();
-		return $res->country_name;
-	}
 
-	/**
-	 Get all countries information
-	 */
-	public function get_countries()
-	{
-		$this->db->from('countries');
-		$this->db->order_by('country_name' , 'asc');
-		$query = $this->db->get()->result();
-		return $query;
-	}
-
-	public function get_user_photos($user_id)
-	{
-		$this->db->from('users_photos');
-		$this->db->where('user_id' , $user_id);
-		$results = $this->db->get()->row();
-		return $results;
 	}
 }
 ?>
