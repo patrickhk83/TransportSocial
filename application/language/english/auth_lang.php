@@ -128,6 +128,7 @@ $lang['edit_user_validation_company_label']          = 'Company Name';
 $lang['edit_user_validation_groups_label']           = 'Groups';
 $lang['edit_user_validation_password_label']         = 'Password';
 $lang['edit_user_validation_password_confirm_label'] = 'Password Confirmation';
+$lang['edit_user_successful_editing'] 							 = 'You have successfully edited your account details';
 
 // Create Group
 $lang['create_group_title']                  = 'Create Group';
