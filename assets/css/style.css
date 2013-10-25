@@ -1,0 +1,11 @@
+.thumb {
+	width:100px;
+	height:auto;
+	max-width:100%;
+}
+
+.datepicker {
+	z-index: 9999 !important;
+	top: 0;
+	left: 0;
+}
